@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Keyboardify",
-  "description": "...",
+  "description": "A chrome and firefox extension for eliminating the need for a mouse while browsing",
   "version": "0.1.0",
   "content_scripts": [
     {
-      "matches": ["*://*.finki.ukim.mk/*"],
+      "matches": ["*://*/*"],
       "js": [ "keyboardify.js" ]
     }
   ]
