@@ -139,6 +139,11 @@ window.addEventListener('keydown', event => {
     }
 
     if (!LETTERS.includes(event.key.toLowerCase())) {
+        if (event.key.toLowerCase() === 'e') {
+            clearLinks()
+            return
+        }
+
         console.log(`non-LETTER key pressed ${event.key}`)
         return
     }
