@@ -22,6 +22,6 @@ In "link" mode, all links on the screen are marked, allowing quick access throug
 | `A`   | Mark all links on the screen, and enters `link` mode. |
 | `ESC` | Escape `link` mode (clears all links).                |
 | `H`   | Move backwards in the browser history.                |
-| `;`   | Move formards in the browser history.                 |
+| `;`   | Move forwards in the browser history.                 |
 | `K`   | Smooth scroll up.                                     |
 | `L`   | Smooth scroll down.                                   |
