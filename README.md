@@ -13,7 +13,7 @@ In "link" mode, all links on the screen are marked, allowing quick access throug
 
 ## Demo
 
-<img width="30%" src="./docs/demo.gif"/>
+![demo](./docs/demo.gif)
 
 ## Keybindings
 
