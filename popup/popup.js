@@ -5,6 +5,17 @@ chrome.runtime.getBackgroundPage(function (backgroundPage) {
     console = backgroundPage.console;
 })
 
+let input = document.getElementById("input")
+input.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() == "enter") {
+        browser.runtime.sendMessage({
+            action: "popup-request-info",
+            input: input.value
+        })
+    }
+})
+input.focus()
+
 await browser.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
     let tab = tabs[0];
 

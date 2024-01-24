@@ -3,7 +3,7 @@ browser.runtime.onInstalled.addListener(async () => {
     console.log("Installed")
     await browser.contextMenus.create({
         id: CONTEXT_MENU_ID,
-        title: "Popup Compare",
+        title: "Search Product...",
         contexts: ["selection"],
     })
 })
@@ -62,9 +62,20 @@ const extractProduct = ({ host, html }) => {
         return undefined
     }
 
-    let result = { title: title.trim(), price }
-    console.log(result)
-    return result
+    return { title: title.trim(), price }
+}
+
+const init = (selection) => {
+    workerTabs = []
+    products = []
+
+    for (const page of PAGES) {
+        startWorkerTab(page, selection)
+        browser.runtime.sendMessage({
+            action: "background-popup",
+            products,
+        })
+    }
 }
 
 await browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
@@ -75,6 +86,9 @@ await browser.runtime.onMessage.addListener(async (request, sender, sendResponse
                 action: "background-popup",
                 products,
             });
+            if (request.hasOwnProperty("input")) {
+                init(request.input.trim())
+            }
             break;
         }
         case "content-info": {
@@ -100,18 +114,10 @@ await browser.runtime.onMessage.addListener(async (request, sender, sendResponse
 });
 
 browser.contextMenus.onClicked.addListener(async (info) => {
-    if (info.menuItemId === CONTEXT_MENU_ID) {
-        browser.action.openPopup()
-
-        workerTabs = []
-        products = []
-
-        for (const page of PAGES) {
-            startWorkerTab(page, info.selectionText)
-            browser.runtime.sendMessage({
-                action: "background-popup",
-                products,
-            })
-        }
+    if (info.menuItemId !== CONTEXT_MENU_ID) {
+        return;
     }
+
+    browser.action.openPopup()
+    init(info.selectionText)
 });

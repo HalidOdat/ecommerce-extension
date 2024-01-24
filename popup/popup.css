@@ -1,0 +1,8 @@
+body {
+    padding: 4px;
+}
+
+#input {
+    width: 450px;
+    border: 2px solid darkgray;
+}
