@@ -1,0 +1,47 @@
+[
+    {
+        "host": "www.anhoch.com",
+        "search": "https://www.anhoch.com/products/search?search=",
+        "title": ".products .product-name",
+        "price": ".products .product-price strong"
+    },
+    {
+        "host": "setec.mk",
+        "search": "https://setec.mk/index.php?route=product/search&search=",
+        "title": ".name",
+        "price": ".price-old-new"
+    },
+    {
+        "host": "tehnomarket.com.mk",
+        "search": "https://tehnomarket.com.mk/products/search?search=",
+        "title": ".product-name",
+        "price": ".product-price strong"
+    },
+    {
+        "host": "www.aliexpress.com",
+        "search": "https://www.aliexpress.com/w/wholesale-",
+        "suffix": ".html",
+        "searchReplace": [
+            "%20",
+            "-"
+        ],
+        "title": ".multi--titleText--nXeOvyr",
+        "price": ".multi--price--1okBCly"
+    },
+    {
+        "host": "www.alibaba.com",
+        "search": "https://www.alibaba.com/trade/search?SearchText=",
+        "searchReplace": [
+            "%20",
+            "+"
+        ],
+        "title": ".search-card-e-title",
+        "price": ".search-card-e-price-main"
+    },
+    {
+        "host": "www.amazon.com",
+        "search": "https://www.amazon.com/s?k=",
+        "title": "span.a-size-medium.a-color-base.a-text-normal",
+        "price": "span.a-price>span"
+    }
+]

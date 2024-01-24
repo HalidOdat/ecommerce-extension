@@ -1,14 +1,55 @@
 {
   "manifest_version": 3,
-  "name": "Keyboardify",
-  "description": "A chrome and firefox extension for eliminating the need for a mouse while browsing",
+  "name": "Ecommercify",
+  "description": "A chrome and firefox extension for helping you shop",
   "version": "0.1.0",
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
-      "js": [ "keyboardify.js" ]
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "images/icon16.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    },
+    "default_title": "Ecommercify",
+    "default_popup": "popup/index.html"
+  },
+  "permissions": [
+    "tabs",
+    "notifications",
+    "history",
+    "background",
+    "webRequest",
+    "contextMenus",
+    "scripting",
+    "activeTab"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "type": "module"
+  },
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "pages.json"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
     }
   ]
 }
-
-
