@@ -4,7 +4,7 @@ A chrome and firefox extension for helping you shop.
 
 ## Demo
 
-## Keybindings
+![Demo GIF](./docs/demo.gif)
 
 ## Author
 
