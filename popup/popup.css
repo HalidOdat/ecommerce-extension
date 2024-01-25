@@ -3,6 +3,6 @@ body {
 }
 
 #input {
-    width: 450px;
+    min-width: 450px;
     border: 2px solid darkgray;
 }

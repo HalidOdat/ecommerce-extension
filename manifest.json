@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "Ecommercify",
   "description": "A chrome and firefox extension for helping you shop",
   "version": "0.1.0",
@@ -13,7 +13,7 @@
       ]
     }
   ],
-  "action": {
+  "browser_action": {
     "default_icon": {
       "16": "icons/icon16.png",
       "19": "icons/icon19.png",
@@ -29,7 +29,8 @@
   "permissions": [
     "tabs",
     "contextMenus",
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
   "background": {
     "scripts": [
@@ -38,13 +39,6 @@
     "type": "module"
   },
   "web_accessible_resources": [
-    {
-      "resources": [
-        "pages.json"
-      ],
-      "matches": [
-        "*://*/*"
-      ]
-    }
+    "pages.json"
   ]
 }

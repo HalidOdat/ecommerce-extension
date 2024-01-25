@@ -1,18 +1,18 @@
 const CONTEXT_MENU_ID = "product-selection"
-browser.runtime.onInstalled.addListener(async () => {
+chrome.runtime.onInstalled.addListener(() => {
     console.log("Installed")
-    await browser.contextMenus.create({
+    chrome.contextMenus.create({
         id: CONTEXT_MENU_ID,
         title: "Search Product...",
         contexts: ["selection"],
     })
 })
 
-const PAGES_URL = await browser.runtime.getURL('/pages.json')
-const PAGES = await fetch(PAGES_URL).then((resp) => resp.json())
+const PAGES_URL = chrome.runtime.getURL('/pages.json')
 
 let workerTabs = []
 let products = []
+
 const startWorkerTab = async (page, name) => {
     const { search, searchReplace, suffix } = page;
 
@@ -25,31 +25,31 @@ const startWorkerTab = async (page, name) => {
         url += suffix
     }
 
-    let tab = await browser.tabs.create({
+    chrome.tabs.create({
         url,
         active: false,
-    })
+    }, (tab) => {
+        workerTabs.push(tab.id)
+        products.push({
+            host: page.host,
+            url,
+            product: undefined,
+            loaded: false,
+        })
 
-    workerTabs.push(tab.id)
-    products.push({
-        host: page.host,
-        url,
-        product: undefined,
-        loaded: false,
+        // This requires "tabHide" permission (only available on firefox :( )):
+        //
+        // await browser.tabs.hide(tab.id)
     })
-
-    // This requires "tabHide":
-    //
-    // await browser.tabs.hide(tab.id)
 }
 
-const extractProduct = ({ host, html }) => {
+const extractProduct = (pages, { host, html }) => {
     const parser = new DOMParser();
     const dom = parser.parseFromString(html, "text/html");
 
     let title;
     let price;
-    for (const page of PAGES) {
+    for (const page of pages) {
         if (page.host != host) {
             continue;
         }
@@ -65,59 +65,69 @@ const extractProduct = ({ host, html }) => {
     return { title: title.trim(), price }
 }
 
-const init = (selection) => {
+const init = (pages, selection) => {
     workerTabs = []
     products = []
 
-    for (const page of PAGES) {
+    for (const page of pages) {
         startWorkerTab(page, selection)
-        browser.runtime.sendMessage({
+        chrome.runtime.sendMessage({
             action: "background-popup",
             products,
         })
     }
 }
 
-await browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-    console.log(request)
-    switch (request.action) {
-        case "popup-request-info": {
-            await browser.runtime.sendMessage({
-                action: "background-popup",
-                products,
-            });
-            if (request.hasOwnProperty("input")) {
-                init(request.input.trim())
+fetch(PAGES_URL)
+    .then((resp) => resp.json())
+    .then((pages) => {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            console.log(request)
+            switch (request.action) {
+                case "popup-request-info": {
+                    sendResponse({
+                        action: "background-popup",
+                        products,
+                    });
+                    if (request.hasOwnProperty("input")) {
+                        init(pages, request.input.trim())
+                    }
+                    break;
+                }
+                case "content-info": {
+                    console.log(`Sender: ${sender.tab.id}, workerTabs: ${workerTabs}`)
+                    if (workerTabs.includes(sender.tab.id)) {
+                        chrome.tabs.remove(sender.tab.id)
+
+                        const product = extractProduct(pages, request)
+
+                        let description = products.find((product) => product.host === request.host)
+                        description.product = product
+                        description.loaded = true
+
+                        console.log("Product: ", product);
+                        chrome.runtime.sendMessage({
+                            action: "background-popup",
+                            products,
+                        });
+                        break
+                    }
+                }
             }
-            break;
-        }
-        case "content-info": {
-            console.log(`Sender: ${sender.tab.id}, workerTabs: ${workerTabs}`)
-            if (workerTabs.includes(sender.tab.id)) {
-                await browser.tabs.remove(sender.tab.id)
+        });
 
-                const product = extractProduct(request)
-
-                let description = products.find((product) => product.host === request.host)
-                description.product = product
-                description.loaded = true
-
-                console.log("Product: ", product);
-                await browser.runtime.sendMessage({
-                    action: "background-popup",
-                    products,
-                });
-                break
+        chrome.contextMenus.onClicked.addListener((info) => {
+            if (info.menuItemId !== CONTEXT_MENU_ID) {
+                return;
             }
-        }
-    }
-});
 
-browser.contextMenus.onClicked.addListener(async (info) => {
-    if (info.menuItemId !== CONTEXT_MENU_ID) {
-        return;
-    }
-
-    browser.action.openPopup()
-    init(info.selectionText)
-});
+            if (typeof (browser) === "object") {
+                // On firefox, it expects 0 aguments otherwise throws
+                chrome.browserAction.openPopup()
+            } else {
+                // On chrome, it expects 1 function aguments otherwise throws
+                chrome.browserAction.openPopup(() => { })
+            }
+            init(pages, info.selectionText)
+        });
+    })
